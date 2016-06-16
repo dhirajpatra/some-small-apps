@@ -16,7 +16,7 @@ class Database
 
     private $_username = 'root';
 
-    private $_password = 'tanusree1';
+    private $_password = '';
 
     private $_database = 'foodora-test';
 
