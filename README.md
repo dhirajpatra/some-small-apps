@@ -70,6 +70,6 @@ So your boss ordered to you to run a script on Dec 20th at 23:00 to fix the prob
 - CLI: [from the application directory]  php index.php for20dec [ For fix which need to run at 20th Dec 23:00 ].
 - CLI: [from the application directory]  php index.php for28dec [ For fix which need to run at 28th Dec 01:00 ].
 - Web URL [from the application directory] index.php?fix=for20dec [ For fix which need to run at 20th Dec 23:00 ].
-- Web URL [from the application directory] index.php?fix=for20dec [ For fix which need to run at 28th Dec 01:00 ].
+- Web URL [from the application directory] index.php?fix=for28dec [ For fix which need to run at 28th Dec 01:00 ].
 - you will get small display messages. Also you should check your database tables to see the affects.
 
