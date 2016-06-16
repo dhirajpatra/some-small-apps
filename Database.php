@@ -7,6 +7,7 @@
  */
 class Database
 {
+
     private $_connection;
 
     private static $_instance;
@@ -25,10 +26,11 @@ class Database
      */
     public static function getInstance()
     {
-        if (!self::$_instance) { // If no instance then make one
-            self::$_instance = new self();
+        if (! self::$_instance) { // If no instance then make one
+            
+            self::$_instance = new self(); 
         }
-
+        
         return self::$_instance;
     }
 
@@ -38,10 +40,11 @@ class Database
     private function __construct()
     {
         $this->_connection = new mysqli($this->_host, $this->_username, $this->_password, $this->_database);
-
+        
         // Error handling
         if (mysqli_connect_error()) {
-            trigger_error('Failed to connect : '.mysql_connect_error(), E_USER_ERROR);
+            
+            trigger_error('Failed to connect : ' . mysql_connect_error(), E_USER_ERROR);
         }
     }
 
@@ -49,8 +52,7 @@ class Database
      * Magic method clone is empty to prevent duplication of connection
      */
     private function __clone()
-    {
-    }
+    {}
 
     /**
      * get connection.
