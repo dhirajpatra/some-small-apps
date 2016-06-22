@@ -24,13 +24,13 @@ class For20dec
      */
     public function __construct()
     
-    { 
+    {
         // db connection class
         require_once 'Database.php';
         
-        $this->_db = Database::getInstance(); 
+        $this->_db = Database::getInstance();
         
-        $this->_mysqli = $this->_db->getConnection(); 
+        $this->_mysqli = $this->_db->getConnection();
     }
 
     /**
@@ -39,7 +39,7 @@ class For20dec
     public final function doTheFix()
     
     {
-        try { 
+        try {
             // take the back up of current vendor_schedule table
             // create back up table first
             $backupSql1 = 'CREATE TABLE ' . $this->_backupVendorSchedule . ' LIKE ' . $this->_vendorSchedule . '';
@@ -60,35 +60,38 @@ class For20dec
                 $vendorSpecialDaysQuery = 'SELECT * FROM ' . $this->_vendorSpeicalDay . ' WHERE vendor_id = ' . $vendor['id'] . '';
                 $vendorSpecialDays = $this->_mysqli->query($vendorSpecialDaysQuery);
                 
-                // loop through all special days of this vendor
-                foreach ($vendorSpecialDays as $vendorSpecialDay) {
-                    
-                    // day of the week in int
-                    $dayOfTheweek = date('w', strtotime($vendorSpecialDay['special_date']));
-                    
-                    // as day of the week in integer is different in our process than php return for sunday
-                    if ($dayOfTheweek == 0) { // only different in sunday
-                        
-                        $dayOfTheweek = 7; // here day of the week in integer
-                    }
-                    
-                    // delete the rows for this vendor for that day of the week it may be 2 rows so better to delete first
-                    $deleteSql = 'DELETE FROM ' . $this->_vendorSchedule . ' WHERE weekday = ' . $dayOfTheweek . ' AND vendor_id = ' . $vendor['id'] . '';
+                if (count($vendorSpecialDays) > 0) {
+                    // delete the rows for this vendor first
+                    $deleteSql = 'DELETE FROM ' . $this->_vendorSchedule . ' WHERE vendor_id = ' . $vendor['id'] . '';
                     $this->_mysqli->query($deleteSql);
                     
-                    // check if start hour and stop hour is NULL from special day data
-                    if (is_null($vendorSpecialDay['start_hour']) && is_null($vendorSpecialDay['stop_hour'])) {
+                    // loop through all special days of this vendor
+                    foreach ($vendorSpecialDays as $vendorSpecialDay) {
                         
-                        $insertSql = 'INSERT INTO vendor_schedule (vendor_id, weekday, all_day, start_hour, stop_hour) values (' . $vendor['id'] . ', ' . $dayOfTheweek . ', ' . $vendorSpecialDay['all_day'] . ', NULL, NULL)';
-                    } else {
+                        // day of the week in int
+                        $dayOfTheweek = date('w', strtotime($vendorSpecialDay['special_date']));
                         
-                        $insertSql = 'INSERT INTO vendor_schedule (vendor_id, weekday, all_day, start_hour, stop_hour) values (' . $vendor['id'] . ', ' . $dayOfTheweek . ', ' . $vendorSpecialDay['all_day'] . ", '" . $vendorSpecialDay['start_hour'] . "', '" . $vendorSpecialDay['stop_hour'] . "')";
-                    }
-                    // insert into vendor schedule from special day
-                    $this->_mysqli->query($insertSql);
-                } // special day loop end here
-                
-                echo 'Data has been fixed for vendor ' . $vendor['name'] . "\n";
+                        // as day of the week in integer is different in our process than php return for sunday
+                        if ($dayOfTheweek == 0) { // only different in sunday
+                            
+                            $dayOfTheweek = 7; // here day of the week in integer
+                        }
+                        
+                        // check if start hour and stop hour is NULL from special day data
+                        if (is_null($vendorSpecialDay['start_hour']) && is_null($vendorSpecialDay['stop_hour'])) {
+                            
+                            $insertSql = 'INSERT INTO vendor_schedule (vendor_id, weekday, all_day, start_hour, stop_hour) values (' . $vendor['id'] . ', ' . $dayOfTheweek . ', ' . $vendorSpecialDay['all_day'] . ', NULL, NULL)';
+                        } else {
+                            
+                            $insertSql = 'INSERT INTO vendor_schedule (vendor_id, weekday, all_day, start_hour, stop_hour) values (' . $vendor['id'] . ', ' . $dayOfTheweek . ', ' . $vendorSpecialDay['all_day'] . ", '" . $vendorSpecialDay['start_hour'] . "', '" . $vendorSpecialDay['stop_hour'] . "')";
+                        }
+                        // insert into vendor schedule from special day
+                        // echo $insertSql; exit;
+                        $this->_mysqli->query($insertSql);
+                    } // special day loop end here
+                    
+                    echo 'Data has been fixed for vendor ' . $vendor['name'] . "\n";
+                } // end special day if condition
             } // vendors loop end here
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
