@@ -1,4 +1,4 @@
-# foodora-test
+# Some small applications
 
 ## 1 - Scenario
 
